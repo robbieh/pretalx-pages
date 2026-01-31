@@ -19,10 +19,22 @@ from django.views.generic import (
     UpdateView,
 )
 from i18nfield.forms import I18nModelForm
+from i18nfield.strings import LazyI18nString
 from pretalx.common.templatetags import rich_text
 from pretalx.common.views.mixins import EventPermissionRequired
 
 from .models import Page
+
+
+def _serialize_form_data(data):
+    """Convert LazyI18nString objects to dicts for JSON serialization."""
+    result = {}
+    for key, value in data.items():
+        if isinstance(value, LazyI18nString):
+            result[key] = dict(value.data) if value.data else str(value)
+        else:
+            result[key] = value
+    return result
 
 ALLOWED_ATTRIBUTES = dict(rich_text.ALLOWED_ATTRIBUTES)
 ALLOWED_ATTRIBUTES["a"] = ["href", "title", "target", "class"]
@@ -193,7 +205,7 @@ class PageUpdate(EventPermissionRequired, PageDetailMixin, PageEditorMixin, Upda
             self.object.log_action(
                 "pretalx_pages.page.changed",
                 person=self.request.user,
-                data={k: form.cleaned_data.get(k) for k in form.changed_data},
+                data=_serialize_form_data({k: form.cleaned_data.get(k) for k in form.changed_data}),
                 orga=True,
             )
         return super().form_valid(form)
@@ -229,7 +241,7 @@ class PageCreate(EventPermissionRequired, PageEditorMixin, CreateView):
         ret = super().form_valid(form)
         form.instance.log_action(
             "pretalx_pages.page.added",
-            data=dict(form.cleaned_data),
+            data=_serialize_form_data(form.cleaned_data),
             person=self.request.user,
             orga=True,
         )
