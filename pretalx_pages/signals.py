@@ -74,12 +74,13 @@ def footer_link_pages(sender, request=None, **kwargs):
     ]
 
 
+PLUGIN_VERSION = "1.8.0-fork-v2"
+
+
 @receiver(html_head, dispatch_uid="pages_nav_tabs")
 def inject_nav_tabs(sender, request=None, **kwargs):
-    """Inject JavaScript to add navigation tabs for pages marked as 'link_in_footer'."""
-    pages = Page.objects.filter(event=sender, link_in_footer=True).order_by("position", "title")
-    if not pages:
-        return ""
+    """Inject JavaScript to add navigation tabs for pages marked as 'link_in_nav'."""
+    pages = Page.objects.filter(event=sender, link_in_nav=True).order_by("position", "title")
 
     # Build the pages data as JavaScript
     pages_js = []
@@ -96,11 +97,20 @@ def inject_nav_tabs(sender, request=None, **kwargs):
     pages_array = "[" + ", ".join(pages_js) + "]"
 
     return f'''
+<!-- pretalx-pages fork version: {PLUGIN_VERSION} -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {{
+    // Debug marker: {PLUGIN_VERSION}
+    console.log("pretalx-pages fork loaded: {PLUGIN_VERSION}");
+
     var pages = {pages_array};
+    if (pages.length === 0) return;
+
     var nav = document.querySelector(".schedule-nav, nav.nav, .nav-tabs, ul.nav");
-    if (!nav) return;
+    if (!nav) {{
+        console.log("pretalx-pages: no nav element found");
+        return;
+    }}
 
     var currentPath = window.location.pathname;
 

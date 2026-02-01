@@ -34,6 +34,9 @@ class Page(LogMixin, models.Model):
     link_in_footer = models.BooleanField(
         default=False, verbose_name=_("Show link in the event footer")
     )
+    link_in_nav = models.BooleanField(
+        default=False, verbose_name=_("Show as navigation tab")
+    )
 
     log_prefix = "pretalx_pages.page"
 
