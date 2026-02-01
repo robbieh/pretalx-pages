@@ -74,7 +74,7 @@ def footer_link_pages(sender, request=None, **kwargs):
     ]
 
 
-PLUGIN_VERSION = "1.8.0-fork-v2"
+PLUGIN_VERSION = "1.8.0-fork-v3"
 
 
 @receiver(html_head, dispatch_uid="pages_nav_tabs")
