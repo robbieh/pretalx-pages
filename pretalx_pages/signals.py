@@ -74,7 +74,7 @@ def footer_link_pages(sender, request=None, **kwargs):
     ]
 
 
-PLUGIN_VERSION = "1.8.0-fork-v3"
+PLUGIN_VERSION = "1.8.0-fork-v4"
 
 
 @receiver(html_head, dispatch_uid="pages_nav_tabs")
@@ -104,14 +104,28 @@ document.addEventListener("DOMContentLoaded", function() {{
     console.log("pretalx-pages fork loaded: {PLUGIN_VERSION}");
 
     var pages = {pages_array};
-    if (pages.length === 0) return;
+    console.log("pretalx-pages: pages to add:", pages);
 
-    var nav = document.querySelector(".schedule-nav, nav.nav, .nav-tabs, ul.nav");
-    if (!nav) {{
-        console.log("pretalx-pages: no nav element found");
+    if (pages.length === 0) {{
+        console.log("pretalx-pages: no pages with link_in_nav=true");
         return;
     }}
 
+    // Try multiple selectors and log what we find
+    var selectors = [".schedule-nav", "nav.nav", ".nav-tabs", "ul.nav", ".nav", "nav ul", "header nav"];
+    var nav = null;
+    for (var i = 0; i < selectors.length; i++) {{
+        var found = document.querySelector(selectors[i]);
+        console.log("pretalx-pages: selector '" + selectors[i] + "' found:", found);
+        if (found && !nav) nav = found;
+    }}
+
+    if (!nav) {{
+        console.log("pretalx-pages: no nav element found with any selector");
+        return;
+    }}
+
+    console.log("pretalx-pages: using nav element:", nav);
     var currentPath = window.location.pathname;
 
     pages.forEach(function(page) {{
@@ -126,6 +140,7 @@ document.addEventListener("DOMContentLoaded", function() {{
         }}
         li.appendChild(a);
         nav.appendChild(li);
+        console.log("pretalx-pages: added tab for", page.title);
     }});
 }});
 </script>
