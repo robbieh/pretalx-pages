@@ -1,18 +1,8 @@
-{% extends "common/base.html" %}
-{% load rules %}
-
-{% block nav_link %}
-    {% has_perm 'schedule.list_schedule' request.user request.event as can_view_schedule %}
-    {% if can_view_schedule %}
-        {{ request.event.urls.schedule }}
-    {% else %}
-        {{ request.event.urls.base }}
-    {% endif %}
-{% endblock %}
+{% extends "agenda/base.html" %}
 
 {% block extra_title %}{{ page_title }} :: {% endblock %}
 
-{% block content %}
+{% block agenda_content %}
     <h2>{{ page_title }}</h2>
     <article>{{ content|safe }}</article>
 {% endblock %}
