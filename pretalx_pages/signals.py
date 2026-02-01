@@ -1,3 +1,5 @@
+import json
+
 from django.dispatch import receiver
 from django.urls import reverse
 from django.utils.html import escape
@@ -8,6 +10,8 @@ from pretalx.common.urls import build_absolute_uri
 from pretalx.orga.signals import event_copy_data, nav_event
 
 from .models import Page
+
+PLUGIN_VERSION = "1.8.0-fork-v5"
 
 
 @receiver(nav_event)
@@ -74,74 +78,26 @@ def footer_link_pages(sender, request=None, **kwargs):
     ]
 
 
-PLUGIN_VERSION = "1.8.0-fork-v4"
-
-
 @receiver(html_head, dispatch_uid="pages_nav_tabs")
 def inject_nav_tabs(sender, request=None, **kwargs):
-    """Inject JavaScript to add navigation tabs for pages marked as 'link_in_nav'."""
+    """Inject data element and external script for navigation tabs."""
     pages = Page.objects.filter(event=sender, link_in_nav=True).order_by("position", "title")
 
-    # Build the pages data as JavaScript
-    pages_js = []
+    # Build the pages data as JSON
+    pages_data = []
     for page in pages:
         url = build_absolute_uri(
             "plugins:pretalx_pages:show",
             event=sender,
             kwargs={"event": sender.slug, "slug": page.slug},
         )
-        # Get the title as a string (handles i18n)
-        title = str(page.title)
-        pages_js.append(f'{{url: "{url}", title: "{escape(title)}"}}')
+        pages_data.append({"url": url, "title": str(page.title)})
 
-    pages_array = "[" + ", ".join(pages_js) + "]"
+    pages_json = escape(json.dumps(pages_data))
 
+    # Return a hidden div with data attributes, plus a script tag loading external JS
     return f'''
 <!-- pretalx-pages fork version: {PLUGIN_VERSION} -->
-<script>
-document.addEventListener("DOMContentLoaded", function() {{
-    // Debug marker: {PLUGIN_VERSION}
-    console.log("pretalx-pages fork loaded: {PLUGIN_VERSION}");
-
-    var pages = {pages_array};
-    console.log("pretalx-pages: pages to add:", pages);
-
-    if (pages.length === 0) {{
-        console.log("pretalx-pages: no pages with link_in_nav=true");
-        return;
-    }}
-
-    // Try multiple selectors and log what we find
-    var selectors = [".schedule-nav", "nav.nav", ".nav-tabs", "ul.nav", ".nav", "nav ul", "header nav"];
-    var nav = null;
-    for (var i = 0; i < selectors.length; i++) {{
-        var found = document.querySelector(selectors[i]);
-        console.log("pretalx-pages: selector '" + selectors[i] + "' found:", found);
-        if (found && !nav) nav = found;
-    }}
-
-    if (!nav) {{
-        console.log("pretalx-pages: no nav element found with any selector");
-        return;
-    }}
-
-    console.log("pretalx-pages: using nav element:", nav);
-    var currentPath = window.location.pathname;
-
-    pages.forEach(function(page) {{
-        var li = document.createElement("li");
-        li.className = "nav-item";
-        var a = document.createElement("a");
-        a.href = page.url;
-        a.textContent = page.title;
-        a.className = "nav-link";
-        if (currentPath.indexOf(page.url) !== -1 || page.url.indexOf(currentPath) !== -1) {{
-            a.classList.add("active");
-        }}
-        li.appendChild(a);
-        nav.appendChild(li);
-        console.log("pretalx-pages: added tab for", page.title);
-    }});
-}});
-</script>
+<div id="pretalx-pages-data" style="display:none" data-version="{PLUGIN_VERSION}" data-pages="{pages_json}"></div>
+<script src="/static/pretalx_pages/nav_tabs.js" defer></script>
 '''
