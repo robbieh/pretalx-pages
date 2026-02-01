@@ -11,7 +11,7 @@ from pretalx.orga.signals import event_copy_data, nav_event
 
 from .models import Page
 
-PLUGIN_VERSION = "1.8.0-fork-v7"
+PLUGIN_VERSION = "1.8.0-fork-v8"
 
 
 @receiver(nav_event)
@@ -91,7 +91,11 @@ def inject_nav_tabs(sender, request=None, **kwargs):
             event=sender,
             kwargs={"event": sender.slug, "slug": page.slug},
         )
-        pages_data.append({"url": url, "title": str(page.title)})
+        pages_data.append({
+            "url": url,
+            "title": str(page.title),
+            "icon": page.icon or "fa-file-text-o",
+        })
 
     pages_json = escape(json.dumps(pages_data))
 

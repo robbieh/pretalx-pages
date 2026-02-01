@@ -37,6 +37,13 @@ class Page(LogMixin, models.Model):
     link_in_nav = models.BooleanField(
         default=False, verbose_name=_("Show as navigation tab")
     )
+    icon = models.CharField(
+        max_length=50,
+        blank=True,
+        default="fa-file-text-o",
+        verbose_name=_("Tab icon"),
+        help_text=_('Font Awesome icon class (e.g., "fa-heart", "fa-star"). Browse icons at fontawesome.com/v4/icons/'),
+    )
 
     log_prefix = "pretalx_pages.page"
 

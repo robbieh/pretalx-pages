@@ -40,9 +40,14 @@
         a.href = page.url;
         a.className = "header-tab";
 
-        // Add icon like the other tabs
+        // Add icon - use custom icon from data, default to fa-file-text-o
         var icon = document.createElement("i");
-        icon.className = "fa fa-file-text-o";
+        var iconClass = page.icon || "fa-file-text-o";
+        // Ensure it has "fa " prefix
+        if (!iconClass.startsWith("fa ")) {
+            iconClass = "fa " + iconClass;
+        }
+        icon.className = iconClass;
         a.appendChild(icon);
         a.appendChild(document.createTextNode(" " + page.title + " "));
 
@@ -52,6 +57,6 @@
         }
 
         nav.appendChild(a);
-        console.log("pretalx-pages: added tab for", page.title);
+        console.log("pretalx-pages: added tab for", page.title, "with icon", iconClass);
     });
 })();

@@ -124,6 +124,7 @@ class PageForm(I18nModelForm):
             "text",
             "link_in_footer",
             "link_in_nav",
+            "icon",
         )
 
     def clean_slug(self):
