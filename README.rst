@@ -1,5 +1,15 @@
-Static pages for pretalx
-==========================
+Static pages for pretalx (SEBB Fork)
+=====================================
+
+**This is a fork** with additional features for the SEBB event. See `upstream`_ for the original.
+
+Fork additions:
+
+- **Navigation tabs**: Pages can appear as header tabs alongside Schedule/Sessions/Speakers
+- **Custom icons**: Each page can have a custom Font Awesome v4 icon
+- **Bugfix**: LazyI18nString serialization fix for pretalx 2025.2.x compatibility
+
+----
 
 This is a plugin for `pretalx`_ that allows you to add static pages to your
 event, for example FAQ, Terms of Service, a Code of Conduct, etc.
@@ -36,5 +46,6 @@ Released under the terms of the Apache License 2.0
 
 .. _pretalx: https://github.com/pretalx/pretalx
 .. _pretalx development setup: https://docs.pretalx.org/en/latest/developer/setup.html
+.. _upstream: https://github.com/pretalx/pretalx-pages
 .. |screenshots| image:: https://raw.githubusercontent.com/pretalx/pretalx-pages/master/assets/screenshots.png
    :alt: Screenshots of pretalx pages
