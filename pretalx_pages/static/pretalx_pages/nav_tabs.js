@@ -24,35 +24,34 @@
         return;
     }
 
-    // Try multiple selectors and log what we find
-    var selectors = [".schedule-nav", "nav.nav", ".nav-tabs", "ul.nav", ".nav", "nav ul", "header nav"];
-    var nav = null;
-    for (var i = 0; i < selectors.length; i++) {
-        var found = document.querySelector(selectors[i]);
-        console.log("pretalx-pages: selector '" + selectors[i] + "' found:", found);
-        if (found && !nav) nav = found;
-    }
+    // Pretalx uses #header-tabs with <a class="header-tab"> elements
+    var nav = document.getElementById('header-tabs');
+    console.log("pretalx-pages: #header-tabs found:", nav);
 
     if (!nav) {
-        console.log("pretalx-pages: no nav element found with any selector");
+        console.log("pretalx-pages: no #header-tabs element found");
         return;
     }
 
-    console.log("pretalx-pages: using nav element:", nav);
     var currentPath = window.location.pathname;
 
     pages.forEach(function(page) {
-        var li = document.createElement("li");
-        li.className = "nav-item";
         var a = document.createElement("a");
         a.href = page.url;
-        a.textContent = page.title;
-        a.className = "nav-link";
-        if (currentPath.indexOf(page.url) !== -1 || page.url.indexOf(currentPath) !== -1) {
+        a.className = "header-tab";
+
+        // Add icon like the other tabs
+        var icon = document.createElement("i");
+        icon.className = "fa fa-file-text-o";
+        a.appendChild(icon);
+        a.appendChild(document.createTextNode(" " + page.title + " "));
+
+        // Check if this is the current page
+        if (currentPath.indexOf("/page/" + page.url.split("/page/")[1]) !== -1) {
             a.classList.add("active");
         }
-        li.appendChild(a);
-        nav.appendChild(li);
+
+        nav.appendChild(a);
         console.log("pretalx-pages: added tab for", page.title);
     });
 })();

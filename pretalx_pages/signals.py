@@ -11,7 +11,7 @@ from pretalx.orga.signals import event_copy_data, nav_event
 
 from .models import Page
 
-PLUGIN_VERSION = "1.8.0-fork-v5"
+PLUGIN_VERSION = "1.8.0-fork-v6"
 
 
 @receiver(nav_event)
